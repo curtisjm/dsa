@@ -62,22 +62,22 @@ void printStats(int N) {
 int partition(int arr[], int left, int right) {
 	int pivot = arr[right];
 	// i is the index of the smaller number
-	int i = left - 1;
+	int i = left;
 
 	// j keeps track of current number that we are examining
-	for (int j = left; j <= right - 1; j++) {
+	for (int j = left; j < right; j++) {
 		if (compare(arr[j], pivot) == -1) {
-			i++;
 			swap(arr, i, j);
+			i++;
 		}
 		// all nums up to i are < pivot
 		// all nums up to j are >= pivot
 	}
 
 	// make sure pivot is in between two groups
-	swap(arr, i + 1, right);
+	swap(arr, i, right);
 	// return index of the pivot
-	return (i + 1);
+	return i;
 }
 
 void quickSort(int arr[], int left, int right) {
