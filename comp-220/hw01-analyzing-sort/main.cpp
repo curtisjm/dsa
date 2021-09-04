@@ -5,9 +5,9 @@
 
 /*
 
-  Submission:  Along with a link to ths repl, remember to copy and fill out this google spreadsheet with your results:
+	Link to my Google Sheets Analysis
 
-  https://docs.google.com/spreadsheets/d/1gGLdji0SbLiGeoUvvcCdixevRXZ5XWg2hDedQvOxumA/edit?usp=sharing 
+	https://docs.google.com/spreadsheets/d/13gWXK_6HIM24XVvIy9kZ_V6gK1qZME3Y-r_eqf3O0Fs/edit?usp=sharing
 
 */
 
@@ -125,7 +125,7 @@ int main() {
 	std::cout << "HW My Sort\n";
 
 	// number of items we are sorting
-	const int N = 64;
+	const int N = 65536;
 	// array of N items
 	int a[N];
 

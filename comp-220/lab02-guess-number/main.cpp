@@ -4,7 +4,6 @@
 using namespace std;
 
 int main() {
-
 	// this is our upper limit - change it to any value you like (powers of 2 may work best)
 	int N = 1024;
 
@@ -30,9 +29,14 @@ int main() {
 	int guessCount = 0;
 
 	while (true) {
-
-		// TODO: Your code goes here
-
+		newGuess = (low + high) / 2;
+		guessCount++;
+		cout << newGuess << endl;
+		if (newGuess == secretValue) break;
+		if (newGuess > secretValue)
+			low = newGuess;
+		else
+			high = newGuess;
 	}
 
 	cout << "I guessed it in " << guessCount << " guesses. \nThe secret value was " << secretValue << endl;
