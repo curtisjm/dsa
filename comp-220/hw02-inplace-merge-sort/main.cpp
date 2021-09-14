@@ -107,6 +107,16 @@ void printStats(long N) {
 //
 // You must "merge" these left and right halves so the entire range start->end is sorted
 
+void singleBubblePass(int arr[], int start, int end) {
+    for (int i = start; i < end - start + 1; i++) {
+        if (compare(arr[i], arr[i + 1]) == 1) {
+            mySwap(arr, i, i + 1);
+        } else {
+            return;
+        }
+    }
+}
+
 void mergeBaseInPlace(int arr[], int start, int mid, int end) {
 
     // uncomment below if/when you need help debugging your function
@@ -118,18 +128,33 @@ void mergeBaseInPlace(int arr[], int start, int mid, int end) {
     //printSubArr(arr, start, end);
 
     // TODO: Your code goes here
-    int i = start;
-    int j = mid + 1;
-    while (i <= mid && j <= end) {
-        if (compare(i, j) == -1) mySwap(arr, i, j);
-        i++, j++;
-    }
-    while (i <= mid) {
+    // int x = 0;
+    // int i = start;
+    // int j = mid + 1;
+    // while (i <= mid && j <= end) {
+    //     if (compare(i, j) == 1) mySwap(arr, i, j);
+    //     j++;
+    //     i++;
+    // }
 
+    for (int i = start; i < mid + 1; i++) {
+        // find min value of right array and swap it with the current element of the left array if it is smaller than that element
+        if (compare(arr[i], mid + 1) == 1) {
+            mySwap(arr, i, mid + 1);
+            singleBubblePass(arr, mid + 1, end);
+        }
     }
-    while (j <= end) {
+    // one pass of bubble sort
 
-    }
+
+
+
+    // while (i <= mid) {
+
+    // }
+    // while (j <= end) {
+
+    // }
 
     // do not delete - this will help us keep track of how many times we call the mergeBaseInPlace() function
     baseCount++;
@@ -142,6 +167,7 @@ void mergeBaseInPlace(int arr[], int start, int mid, int end) {
 }
 
 void mergeSort(int arr[], int start, int end) {
+    cout << "------ IN MERGE SORT ------" << endl;
     if (start >= end) return;
     // find midpoint
     int mid = (start + mid) / 2;
@@ -171,8 +197,8 @@ int main() {
         // size of array, 2 raised to a power from our outer loop
         int N = pow(2, pwr);
 
-        int a[N];
-
+        // int a[N];
+        int* a = new int(N);
         // build a random list with duplicates
         for (int i = 0; i < N; i++) {
             a[i] = rand() % N + 1;
