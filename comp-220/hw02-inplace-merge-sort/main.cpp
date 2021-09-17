@@ -71,6 +71,7 @@ void printStats(long N) {
 
 // a modified version of shell sort
 void mergeBaseInPlace(int arr[], int start, int mid, int end) {
+    // original gap is half of the length of the region we are sorting
     int g = (int)ceil((end - start + 1) / 2.0);
 
     // go until gap is 0 (have to force 0 bc/ will never reach it on its own), gap gets / 2 each iteration
