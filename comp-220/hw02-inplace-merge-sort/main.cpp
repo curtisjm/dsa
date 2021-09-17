@@ -1,10 +1,8 @@
 /*
 
-  Finish Implementation of the mergeBaseInPlace() function outlines below.
+    My copy of the Google Sheet:
 
-  Remember to submit your data results via a copy of the google spreadsheet link provided below
-
-  https://docs.google.com/spreadsheets/d/1PM1zjXTSZZ0pATZyeq1BJ99toRM0nAVgxYInWHjS7ks
+    https://docs.google.com/spreadsheets/d/1K2Zn600T6FUjIZSJgzK_PKmAVIfxoC35ZxiKmzFHL7E/edit?usp=sharing
 
 */
 
@@ -78,85 +76,23 @@ void printStats(long N) {
     // swapCount = 0;
 }
 
-//
-// TODO - implement an in-place version of the base merge function, which will be called from mergeSort()
-// You may NOT utilize any auxilliary array storage declared inside or outside of your function
-// You MAY use temporary variables as needed.
-// You MUST utilize the compare() and myswap() functions for credit.
-//
-
-// Implementation Notes for mergeBaseInPlace() below:
-// 
-// arr[] is an array of integers that are alraedy ordered in left and right halves between start and end
-//    the left half is sorted between "start" and "mid"
-//    the right half is sorted between "mid+1" and "end"
-//   ....  ONLY merge in the range from "start" to "end" (inclusive)
-//   remember that start and end are not the first and last positions of the array - they may be a "middle" span
-//      so:  arr[] to the left of start may extend for quite a few array locations (start is not zero)
-//      and: arr[] to the right of end may extend for quite a few array locations (end is not the last position of the array)
-
-// arr[] looks like this:
-//  _ _ ______________________________________________________
-//      |   |   |   |   |   |   |   |   |   |   |   |   |   |
-//  - - ------------------------------------------------------
-//        ^           ^   ^               ^
-//       start       mid  mid+1          end
-//
-//  assume arr[] is already sorted descending between start and mid
-//  assume arr[] is already sorted descending between mid+1 and end
-//
-// You must "merge" these left and right halves so the entire range start->end is sorted
-
-void singleBubblePass(int arr[], int start, int end) {
-    for (int i = start; i < end - start + 1; i++) {
-        if (compare(arr[i], arr[i + 1]) == 1) {
-            mySwap(arr, i, i + 1);
-        } else {
-            return;
-        }
-    }
-}
-
+// a modified version of shell sort
 void mergeBaseInPlace(int arr[], int start, int mid, int end) {
+    int g = (int)ceil((end - start + 1) / 2.0);
 
-    // uncomment below if/when you need help debugging your function
-    //cout << "\n*mergeBaseInPlace() = " << start << " to " << end << ": ";
-    //printSubArr(arr, start, end);
-
-    // uncomment below if/when you need help debugging your function
-    //cout << "\n*mergeBaseInPlace() done:";
-    //printSubArr(arr, start, end);
-
-    // TODO: Your code goes here
-    // int x = 0;
-    // int i = start;
-    // int j = mid + 1;
-    // while (i <= mid && j <= end) {
-    //     if (compare(i, j) == 1) mySwap(arr, i, j);
-    //     j++;
-    //     i++;
-    // }
-
-    for (int i = start; i < mid + 1; i++) {
-        // find min value of right array and swap it with the current element of the left array if it is smaller than that element
-        if (compare(arr[i], mid + 1) == 1) {
-            mySwap(arr, i, mid + 1);
-            singleBubblePass(arr, mid + 1, end);
+    // go until gap is 0 (have to force 0 bc/ will never reach it on its own), gap gets / 2 each iteration
+    for (g; g > 0; g = (g <= 1) ? 0 : (int)ceil(g / 2.0)) {
+        // stop when right number gets out of range 
+        for (int i = start; (i + g) <= end; i++) {
+            int j = i + g;
+            // swap if num on left side of gap is larger
+            if (compare(arr[i], arr[j]) == -1) {
+                mySwap(arr, i, j);
+            }
         }
     }
-    // one pass of bubble sort
 
-
-
-
-    // while (i <= mid) {
-
-    // }
-    // while (j <= end) {
-
-    // }
-
-    // do not delete - this will help us keep track of how many times we call the mergeBaseInPlace() function
+    // keep track of how many times we call the mergeBaseInPlace() function
     baseCount++;
     // verify that the merge worked... you can comment this out if you want...
     // but if it is failing, it indicates your final solution will be incorrect.
@@ -167,10 +103,10 @@ void mergeBaseInPlace(int arr[], int start, int mid, int end) {
 }
 
 void mergeSort(int arr[], int start, int end) {
-    cout << "------ IN MERGE SORT ------" << endl;
+    // cout << "------ IN MERGE SORT ------" << endl;
     if (start >= end) return;
     // find midpoint
-    int mid = (start + mid) / 2;
+    int mid = (start + end) / 2;
     // sort left side
     mergeSort(arr, start, mid);
     // sort right side
@@ -188,17 +124,15 @@ int main() {
     // new seed each time
     srand(time(NULL));
 
-
     bool debug = true;
 
     // power loop to grow N by doubling: 2, 4, 8, 16
     for (int pwr = 1; pwr < 10; pwr++) {
-
         // size of array, 2 raised to a power from our outer loop
         int N = pow(2, pwr);
 
-        // int a[N];
-        int* a = new int(N);
+        int a[N];
+        // int* a = new int(N);
         // build a random list with duplicates
         for (int i = 0; i < N; i++) {
             a[i] = rand() % N + 1;
@@ -234,7 +168,6 @@ int main() {
         myFile << N << ", " << std::fixed << N * log2(N) << ", ________________linearithmic " << endl;
         //myFile << N << ", " << std::fixed << N*N                         <<  ", quadratic "               << endl;
         //myFile << N << ", " << sampleCount  << ", cubic, "           << std::fixed << long(N*N*N)                 << endl;
-
     }
     // end power loop to grow N by doubling: 2, 4, 8, 16
 
