@@ -17,7 +17,6 @@ using namespace std;
 
 long baseCount = 0;
 long swapCount = 0;
-// increment copy count manually if you are not doing any swaps
 long copyCount = 0;
 long compareCount = 0;
 long shortcutCount = 0;
@@ -26,7 +25,6 @@ int compare(int a, int b) {
     compareCount++;
     if (a > b) return 1;
     if (a < b) return -1;
-    // they must be equal
     return 0;
 }
 
@@ -40,13 +38,11 @@ void printSubArr(int arr[], int start, int end) {
 bool isSortedDescending(int arr[], int start, int end) {
     for (int i = start; i < end; i++) {
         if (arr[i] < arr[i + 1])
-            // not descending
             return false;
     }
     return true;
 }
 
-// swap i and j and increment counter
 void mySwap(int a[], int i, int j) {
     swapCount++;
     int temp = a[i];
@@ -71,9 +67,6 @@ void printStats(long N) {
     // may be zero if you are just counting swapping via mySwap() above
     cout << "Number of copies = " << copyCount << endl;
     cout << "Number of calls to base merge = " << baseCount << endl;
-
-    // compareCount = 0;
-    // swapCount = 0;
 }
 
 // a modified version of shell sort
@@ -103,7 +96,6 @@ void mergeBaseInPlace(int arr[], int start, int mid, int end) {
 }
 
 void mergeSort(int arr[], int start, int end) {
-    // cout << "------ IN MERGE SORT ------" << endl;
     if (start >= end) return;
     // find midpoint
     int mid = (start + end) / 2;
@@ -132,7 +124,7 @@ int main() {
         int N = pow(2, pwr);
 
         int a[N];
-        // int* a = new int(N);
+
         // build a random list with duplicates
         for (int i = 0; i < N; i++) {
             a[i] = rand() % N + 1;
@@ -169,7 +161,6 @@ int main() {
         //myFile << N << ", " << std::fixed << N*N                         <<  ", quadratic "               << endl;
         //myFile << N << ", " << sampleCount  << ", cubic, "           << std::fixed << long(N*N*N)                 << endl;
     }
-    // end power loop to grow N by doubling: 2, 4, 8, 16
 
     // close a data file to store out output data
     myFile.close();
