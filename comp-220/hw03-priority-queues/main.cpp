@@ -1,101 +1,289 @@
 #include <iostream>
 #include <string>
 #include <limits>
-#include <vector>
 #include <cmath>
-#include <time.h>
+#include <iomanip> // for setw() and setFill()
+
 
 using namespace std;
 
+
+//
+// CLASS:  NODE 
+//
+
 class Node {
 public:
-    // our node holds an integer
-    int value = 0;
-    // our node has a pointer to the next Node
-    Node* next = nullptr;
+    int value = 0;           // our node holds an integer
+    Node* left = nullptr;    // our node has a pointer to the left child
+    Node* right = nullptr;    // our node has a pointer to the left child
 
-    // contructor for our Node class
-    Node(int i) {
-        // store a copy of argument "i" in "value"
-        value = i;
-        // be sure next Node is null
-        next = nullptr;
+    Node(int i) {             // constructor for our Node class
+        value = i;                // store a copy of argument "i" in "value"
+        left = nullptr;           // be sure next Node is null
+        right = nullptr;           // be sure next Node is null
     }
-};
+}; // end class definition for Node
+
+
+//
+// CLASS:  MAX PRIORITY QUEUE
+//
+
 
 class MaxPriorityQueueLinkedList {
 private:
     Node* head = nullptr;
-    // # of items in the heap, also next avaialble stack position
-    int currentSize = 0;
+    int currentSize = 0;   // # of items in the stack, also next avaialble stack position
+    int compareCount = 0;  // count of how many compares during the lifetime of this MPQ
+    int swapCount = 0;    // count of how many swaps during the lifetime of this MPQ
 
 public:
-    MaxPriorityQueueLinkedList() {
-        //cout << "Created new Max Priority Queue." << endl;
-        currentSize = 0;
+    MaxPriorityQueueLinkedList() { // constructor
+      //cout << "Created new Max Priority Queue." << endl;
+
+        if (!isEmpty()) { // new queues should be empty
+            cout << "WARNING !!!: Is your isEmpty() function working properly?" << endl;
+        }
         head = nullptr;
     }
 
-    // push a new Node instance into the Priority Queue
-    void push(int i) {
+    //
+    // COMPARE
+    //
 
-        Node* temp = new Node(i); // create a node with i as the value
-
-        // TODO: write your implementation of push here
-        // don't forget to manage the "currentSize" value
-
+    int comparePQ(int a, int b) {
+        compareCount++;
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;  // they must be equal
     }
 
-    // remove the Node with the largest value from the PQ
-    int pop() {
-        // TODO: 
-        // Write your implementation of pop here
-        // You will need to search the queue rooted at "head" to find the largest value
-        // Don't forget to manage the "currentSize" value when you pop the Node
-        // Don't forget to return -1 if your queue is empty
-        // Otherwise you must return the value of the item you just popped (don't return the Node)
-        // Don't forget to delete the Node you pop before returning, like:
-        //      Node *temp;   // declaration of a pointer to the node that you be deleting
-        //      delete temp;  // deletes the Node pointed to by "temp"
-        //      
-
-        return -1000;    // TODO: you must change this
+    //
+    // swap i and j and increment counter
+    //
+    void swapPQ(int& a, int& b) { // note: these are references, so we can change them
+        swapCount++;
+        int temp = a;
+        a = b;
+        b = temp;
     }
+
+    //
+    // SWAP UP
+    //
+
+    void swapUp(Node* child, Node* parent) {
+        if (comparePQ(child->value, parent->value) == 1) { // if child is larger its parent
+            swapPQ(child->value, parent->value); // bubble up the larger value (not the node)
+        }
+    }
+
+    //
+    // BUBBLE DOWN (called by pop)
+    //
+
+      // recursively swap the smaller value down, starting with the head
+    void bubbleDown(Node* start = nullptr, Node* parent = nullptr) {
+
+        if (start == nullptr)
+            return; // nothing to bubble down to
+
+        if (parent != nullptr) // if we are not at the head
+            swapUp(start, parent); // swap start with parent if start is bigger than parent
+
+          // pick the larger of the 2 children that exist and bubble down if needed
+
+        Node* pickChild = nullptr;   // max PQ: pick largest
+
+        if (start->left == nullptr) // only a right child
+            pickChild = start->right;
+
+        else if (start->right == nullptr) // only a left child
+            pickChild = start->left;
+
+        else { // pick the larger of two children
+            int cmp = comparePQ(start->left->value, start->right->value); // max PQ: pick largest
+            pickChild = (cmp == 1 ? start->left : start->right); // choose left if cmp == 1, else right
+        }
+
+        bubbleDown(pickChild, start); // consider largest Child
+          // note: largestChild could be nullptr if start has no childre.
+          //       this case is handled by the null check at top
+
+    }  // end: bubbleDown()
+
+  //
+  // PUSH - push a new Node instance into the Priority Queue
+  //
+
+    void push(int i, Node* start = nullptr, Node* parent = nullptr) {
+
+        //  start: default value for "start==nullptr" supports recursion
+        //  parent:  the pointer to the parent of "start", if any
+
+        if (start == nullptr) {
+            start = head;         // start was not specified, so assume the head
+            parent = nullptr;     // a precaution - parent must always be null for the head
+        }
+
+        // TODO HINT
+
+        return;
+    } // end push()
+
+  //
+  // POP 
+  //
+
+    // remove the top node in the PQ (largest if Max PQ, else smallest )
+    int pop(Node* start = nullptr, Node** startPtr = nullptr) {
+
+        //  start: default value for "start==nullptr" supports recursion
+        //  startPtr: the address of the left or right pointer that refers to start
+
+
+        if (start == nullptr) { // start was not specified, so assume the head
+            start = head;
+            startPtr = nullptr;     // a precaution - parent must always be null for the head
+        }
+
+        // TODO HINT
+
+        return 1000000; // this should never happen
+    } // end pop()
+
+ //
+ // IS EMPTY
+ //
 
     bool isEmpty() {
-        // TODO:
-        // return true if the queue is empty, else false
-        return (rand() % 100 < 50 ? false : true);  // TODO: you must change this! :)
+        // Return true if the queue is empty, else false
+        return (currentSize == 0); // return true if emtpy, otherwise false
     }
+
+    //
+    // GET SIZE
+    //
 
     int getSize() {
-        // return the current size of the Max Priority Queue (how many nodes does it have?)
-        return (rand() % 100 < 50 ? false : true);  // TODO: you must change this! :)
+        // Return the current size of the Max Priority Queue (how many nodes does it have?)
+        return currentSize; // return the count of items in the stack, not the maxSize
     }
 
-    void print() {
-        if (isEmpty()) {
-            cout << "printQueue(): Max Prirority Queue is empty" << endl;
-            return;
+    //
+    // PRINT QUEUE
+    //
+
+    void print(Node* start = nullptr) {
+
+        if (start == nullptr) // if nullptr, then we should start from the head
+            start = head;
+
+        if (start == nullptr) {
+            cout << "Empty tree" << endl;
+            return; // head is null, so nothing to print
         }
 
-        cout << "print(Current Size: " << currentSize << "): ";
 
-        Node* next = head;
-        while (next != nullptr) {
-            cout << next->value << ", ";
-            next = next->next;
+        // current
+
+        cout << start->value << ", ";  // print the current node
+      // LEFT
+
+        if (start->left != nullptr)   // only recurse if we have a left child
+            print(start->left);
+
+
+
+        // RIGHT
+
+        if (start->right != nullptr)   // only recurse if we have a right child
+            print(start->right);
+    } // end print()
+
+  //
+  // PRINT TREE GEEKS
+  //   FROM https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
+  //
+
+      // Function to print binary tree in 2D  
+      // It does reverse inorder traversal  
+      // count = allocation of space per node horizontally - spreads out the tree left to right
+
+    void printTreeGeeks(int count = 10, int space = 0, char prefix = '<', Node* start = nullptr) {
+
+        if (start == nullptr)
+            start = head;         // start was not specified, so assume the head
+
+        if (start == nullptr) {
+            cout << "\nPrinting Tree (Geeks): Empty tree" << endl;
+            return; // head is null, so nothing to print
         }
+
+        if (space == 0) cout << "\nPrinting Tree (Geeks) ****************" << endl; // print if we are at the first level
+
+          // Increase distance between levels  
+        space += count;
+
+        // Process right child first  
+        if (start->right != nullptr)
+            printTreeGeeks(count, space, '/', start->right);
+
+        // Print current node after space  
+        // count  
         cout << endl;
+        // for (int i = count; i < space; i++)  
+        //     cout<<" ";  
+        cout << setw(space - count) << prefix << start->value;
+        if (start->left == nullptr && start->right == nullptr)
+            cout << ":\n";
+        else if (start->left == nullptr)
+            cout << ".\n";
+        else if (start->right == nullptr)
+            cout << "`\n";
+        else
+            cout << "<\n";
+
+        // Process left child  
+        if (start->left != nullptr)
+            printTreeGeeks(count, space, '\\', start->left);
+    } // end printTreeGeeks()
+
+
+//
+// PRINT STATS
+//
+
+    void printStats() {
+
+        int N = currentSize;
+
+        cout << "\nResults:" << endl;
+        cout << "Number of elements (N) = " << N << endl;
+        cout << "Log(N) = " << log2(N) << endl;
+        cout << "NLog(N) = " << N * log2(N) << endl;
+        cout << "N^2 = " << N * N << endl;
+        cout << "(N-1)^2 = " << (N - 1) * (N - 1) << endl;
+        cout << "N(N-1)/2 = " << (N) * (N - 1) / 2 << endl;
+        cout << "N(N-1)/2 = " << (N) * (N - 1) / 2 << endl;
+        cout << "Average Number of compares = " << compareCount << endl;
+        cout << "Average Number of swaps = " << swapCount << endl;
+
     }
 
+};  // end definition of MAX PRIORITY QUEUE CLASS
 
-};
 
-// this routine will test your program and grade your submission
+
+
+//
+// TEST ME - this routine will test your program and grade your submission
+//
+
 void testMe() {
-    // create an instance of a Max Priority Queue
-    MaxPriorityQueueLinkedList mpq;
+
+    MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
 
     int totalScore = 0;
 
@@ -103,10 +291,10 @@ void testMe() {
     cout << "        TESTING HW" << endl;
     cout << "------------------------------" << endl;
 
-    // ismEmpty() working: 5 points
-    bool isEmptyOk = true;
-    // getSize() working: 5 points
-    bool getSizeOk = true;
+
+
+    bool isEmptyOk = true;     // ismEmpty() working: 5 points
+    bool getSizeOk = true;     // getSize() working: 5 points
 
     if (!mpq.isEmpty()) {
         cout << "testMe() ERROR: isEmpty() returned false on a new Priority Queue, when it should have returned true." << endl;
@@ -127,16 +315,14 @@ void testMe() {
         getSizeOk = false;
     }
 
-    // now we should have 1 item
-    mpq.pop();
+    mpq.pop(); // now we should have 1 item
 
     if (mpq.getSize() != 1) {
         cout << "testMe() ERROR: getSize() did not return a value of 1 for a Priority Queue with one item after a pop." << endl;
         getSizeOk = false;
     }
 
-    // now we should have zero items
-    mpq.pop();
+    mpq.pop(); // now we should have zero items
 
     if (mpq.getSize() != 0) {
         cout << "testMe() ERROR: getSize() did not return a value of 0 for a Priority Queue with zero items after a pop." << endl;
@@ -159,13 +345,15 @@ void testMe() {
         totalScore += 5;
     }
 
+
+    //
+    // TEST POP A
+    //
+
     cout << "testMe() Pop Test A: Testing push(1), pop() with new queue..." << endl;
 
-
-    // test pop A
     {
-        // create an instance of a Max Priority Queue
-        MaxPriorityQueueLinkedList mpq;
+        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
         mpq.push(1);
         int num = mpq.pop();
 
@@ -174,16 +362,19 @@ void testMe() {
             //exit(-1);
         } else {
             cout << "         Pop Test A: looks good.  +10 of 10 possible points" << endl;
-            // push/pop working for simple test
-            totalScore += 10;
+            totalScore += 10; // push/pop working for simple test
         }
     }
 
-    // test pop B
+
+
+    //
+    // TEST POP B
+    //
+
     {
         cout << "testMe() Pop Test B: Testing push(1), push(2),pop() with new queue..." << endl;
-        // create an instance of a Max Priority Queue
-        MaxPriorityQueueLinkedList mpq;
+        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
         mpq.push(1);
         mpq.push(2);
         int num = mpq.pop();
@@ -192,17 +383,18 @@ void testMe() {
             cout << "         Pop Test B failed.  0 of 10 possible points" << endl;
         } else {
             cout << "         Pop Test B: looks good.  +10 of 10 possible points" << endl;
-            // push/pop working for simple test
-            totalScore += 10;
+            totalScore += 10; // push/pop working for simple test
         }
 
     }
 
-    // test pop C
+    //
+    // TEST POP C
+    //
+
     {
         cout << "testMe() Pop Test C: Testing pop() on empty queue == -1..." << endl;
-        // create an instance of a Max Priority Queue
-        MaxPriorityQueueLinkedList mpq;
+        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
 
         int num = mpq.pop();
         if (num != -1) {
@@ -210,22 +402,22 @@ void testMe() {
             cout << "         Pop Test C failed.  0 of 5 possible points" << endl;
         } else {
             cout << "         Pop Test C: looks good.  +5 of 5 possible points" << endl;
-            // push/pop working for simple test
-            totalScore += 5;
+            totalScore += 5; // push/pop working for simple test
         }
 
     }
 
-    // test push N / pop N
+    //
+    // TEST PUSH N / POP N
+    //
+
     {
 
         cout << "testMe() Push N/Pop N: Testing N pushes and N pops with new queue..." << endl;
-        // create an instance of a Max Priority Queue
-        MaxPriorityQueueLinkedList mpq;
+        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
         bool finishedOk = true;
         int maxCount = 10;
-        // load up a bunch of values
-        for (int i = 0; i < maxCount; i++) mpq.push(i);
+        for (int i = 0; i < maxCount; i++) mpq.push(i); // load up a bunch of values
         for (int i = 0; i < maxCount; i++) {
             if (mpq.isEmpty()) {
                 cout << "         ERROR: isEmpty() returned true too soon. " << endl;
@@ -243,33 +435,28 @@ void testMe() {
 
     }
 
-    // stress test
+    //
+    // STRESS TEST
+    //
+
     {
         int maxCount = 1000;
         cout << "testMe() Stress test: Pushing and Popping randomly " << maxCount << "  times..." << endl;
-        // create an instance of a Max Priority Queue
-        MaxPriorityQueueLinkedList mpq;
+        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
 
-        // random push/pop test
+      // random push/pop test
         srand(time(NULL));
-        //vector<int> v; // a vector of integers
 
         int myCount = 0;
         for (int i = 0; i < maxCount; i++) {
-            // goes from approx -maxCount to maxCount
-            int rnum = rand() % maxCount * 2 - maxCount;
-            // pop a value
-            if (rnum < 0) {
+            int rnum = rand() % maxCount * 2 - maxCount; // goes from approx -maxCount to maxCount
+            if (rnum < 0) { // pop a value
                 int returnValue = mpq.pop();
                 if (returnValue >= 0)
-                    // decrement our counter; else it was already empty
-                    myCount--;
-                // push a value
-            } else {
-                // push the random value
-                mpq.push(rnum);
-                // increment our counter
-                myCount++;
+                    myCount--; // decrement our counter; else it was already empty
+            } else { // push a avlue
+                mpq.push(rnum); // push the random value
+                myCount++; // increment our counter
             }
         }
 
@@ -277,39 +464,35 @@ void testMe() {
             cout << "         ERROR: test count " << myCount << " does not match mpq getSize() of " << mpq.getSize() << endl;
             cout << "         Stress Test failed.  0 of 10 possible points" << endl;
         } else {
-            // stress test ok
-            totalScore += 10;
+            totalScore += 10; // stress test ok
             cout << "         Stress Test looks good.  +10 of 10 possible points" << endl;
         }
     }
 
-    // sort test
+    //
+    // SORT TEST
+    //
+
     {
         int maxCount = 1000;
         cout << "testMe() Sort test: Pushing " << maxCount << "  times, then popping " << maxCount << " times.. should produce a descending sorted list... " << endl;
-        // create an instance of a Max Priority Queue
-        MaxPriorityQueueLinkedList mpq;
+        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
 
         bool isDescending = true;
 
-        // random push / pop test
+
+        // random push/pop test
         srand(time(NULL));
-        // a vector of integers
-        vector<int> v;
         int myCount = 0;
         for (int i = 0; i < maxCount; i++) {
-            // goes from approx 0 to maxCount-1
-            int rnum = rand() % maxCount;
-            // push the random value
-            mpq.push(rnum);
-            // increment our counter
-            myCount++;
+            int rnum = rand() % maxCount; // goes from approx 0 to maxCount-1
+            mpq.push(rnum); // push the random value
+            myCount++; // increment our counter
             if (myCount != mpq.getSize())
                 isDescending = false;
         }
 
-        // big positive value
-        int lastValue = INT32_MAX;
+        int lastValue = INT32_MAX; // big positive value
         cout << "         checking descending... " << endl;
 
         for (int i = 0; i < maxCount; i++) {
@@ -322,12 +505,10 @@ void testMe() {
 
             if (popValue > lastValue) {
                 cout << "Error: sort test failed... " << lastValue << " should be >= " << popValue << endl;
-                // values are not being returned from largest to smallest
-                bool isDescending = false;
+                bool isDescending = false; // values are not being returned from largest to smallest
                 break;
             }
-            // save for next loop iteration
-            lastValue = popValue;
+            lastValue = popValue; // save for next loop iteration
         }
 
         if (!isDescending) {
@@ -341,70 +522,108 @@ void testMe() {
         cout << "         Done with sort test" << endl;
     }
 
+    //
+    // TEST BONUS TEST
+    //
+
+    {
+
+        cout << "testMe() Push 1K(random)/Pop 1K: Testing 1K pushes and 1K pops with new queue..." << endl;
+        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+        bool bonusOk = true;
+        int maxCount = 10000;
+        for (int i = 0; i < maxCount; i++) mpq.push(rand() % maxCount); // load up a bunch of random values
+        cout << " Stats after push 1K: " << endl;
+        mpq.printStats();
+        for (int i = 0; i < maxCount; i++) {
+            if (mpq.isEmpty()) {
+                cout << "         ERROR: isEmpty() returned true too soon. " << endl;
+                bonusOk = false;
+                break;
+            }
+            mpq.pop();
+        }
+        cout << " Stats after pop 1K: " << endl;
+        mpq.printStats();
+
+        if (bonusOk) {
+            cout << "         Push 1K/Pop 1K looks good - used for bonus." << endl;
+        } else
+            cout << "         Push 1K/Pop 1K failed - used for bonus" << endl;
+
+    }
+
     cout << "-----------------------------------------------------------" << endl;
     cout << "testMe()  DONE! Your preliminary score is: " << totalScore << " out of 80 points" << endl;
     cout << "-----------------------------------------------------------" << endl;
-}
 
 
-// get an integer from input (until success)
+
+} // end testMe()
+
+
+//
+// Get an integer from input (until success)
+// (this function does a bit of extra work to avoid input errors)
+//
+
 int getIntegerInput() {
     int num;
-    // try to get an integer
-    cin >> num;
+    cin >> num;     // try to get an integer
 
-    // keep trying until we get a good integer
-    while (true) {
-        // that was not an integer
-        if (cin.fail()) {
+    while (true) { // keep trying until we get a good integer
+        if (cin.fail()) { // that was not an integer
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "That's not an integer - please try again: ";
             cin >> num;
         }
 
-        // else if we got the integer, break out of the loop
-        if (!cin.fail())
+        if (!cin.fail())  // else if we got the integer, break out of the loop
             break;
     }
-    // return the input integer
-    return num;
-}
+    return num; // return the input integer
+
+} // end getIntegerInput()
+
+//
+// MAIN
+//
+
 
 int main() {
-    std::cout << "HW Starter: Max Priority Queue using a Linked List\n";
+    std::cout << "HW BONUS HINT: Max Priority Queue using a Binary Tree\n";
     cout << "Enter any positive number to push it, or enter a negative value to pop the max value (then hit return) " << endl;
 
     // test mode below - uncomment when you want to see your grade
 
-    //testMe();          // TODO: uncomment this when you are ready to test
+       // testMe();
 
     // interactive mode below
 
-    // create an instance of a Max Priority Queue
-    MaxPriorityQueueLinkedList mpq;
+    MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
 
     // "mpq" is the instance of our Max Priority Queue
     // now we can fill or empty it by pushing and popping
 
-    // loop forever
-    while (true) {
+    while (true) { // loop forever
+
         int num;
         cout << "Enter an integer value: ";
-        // get an integer from input until success
-        num = getIntegerInput();
+        num = getIntegerInput(); // get an integer from input until success
 
         if (num < 0) {
             if (!mpq.isEmpty())
-                // pop the max value from the mp queue
-                cout << "Popped " << mpq.pop() << endl;
+                cout << "Popped " << mpq.pop() << endl; // pop the max value from the mp queue
             else
                 cout << "Sorry - Max Priority Queue is empty. Please push a positive value first." << endl;
-        } else
-            // push num into the max priority queue
-            mpq.push(num);
+        }
 
-        // print contents of the max priority queue
-        mpq.print();
-    }
+        else mpq.push(num); // push num into the max priority queue
+
+        mpq.print(); // print contents of the max priority queue
+        // mpq.printTreeGeeks(); // print as a tree
+
+    } // end while
 }
+
