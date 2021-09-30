@@ -108,14 +108,31 @@ public:
         }
 
         bubbleDown(pickChild, start); // consider largest Child
-          // note: largestChild could be nullptr if start has no childre.
+          // note: largestChild could be nullptr if start has no children.
           //       this case is handled by the null check at top
 
     }  // end: bubbleDown()
 
-  //
-  // PUSH - push a new Node instance into the Priority Queue
-  //
+    void bubbleUp(Node* start = nullptr, Node* parent = nullptr) {
+
+        // nothing to bubble up
+        if (start == nullptr)
+            return;
+
+        // heap invariant satisfied
+        if (comparePQ(start->value, parent->value) == -1)
+            return;
+        
+        if(parent != nullptr) 
+            swapUp(start, parent);
+
+        // TODO: figure out how to recurse up tree
+        // bubbleUp();
+    }
+
+    //
+    // PUSH - push a new Node instance into the Priority Queue
+    //
 
     void push(int i, Node* start = nullptr, Node* parent = nullptr) {
 
@@ -123,20 +140,43 @@ public:
         //  parent:  the pointer to the parent of "start", if any
 
         if (start == nullptr) {
-            start = head;         // start was not specified, so assume the head
-            parent = nullptr;     // a precaution - parent must always be null for the head
+            // start was not specified, so assume the head
+            start = head;
+            // a precaution - parent must always be null for the head
+            parent = nullptr;
+        }
+        // if the start is still null, we insert the new node at the top
+        if (start == nullptr) {
+            head = new Node(i);
+            // insert left if left is null
+        } else if (start->left == nullptr) {
+            start->left = new Node(i);
+            // insert right if right is null
+        } else if (start->right == nullptr) {
+            start->right = new Node(i);
+            // we need to recurse either left or right to find a place to insert
+        } else {
+            // randomly choose 0 or 1
+            int randNum = rand() % 2;
+            if (randNum == 0) {
+                // recurse left, pass the left child
+                // TODO: MAY NEED TO CHANGE START LATER
+                push(i, start->left, start);
+            } else {
+                // recurse right, pass the right child
+                push(i, start->right, start);
+            }
         }
 
-        // TODO HINT
-
+        currentSize++;
         return;
-    } // end push()
+    }
 
-  //
-  // POP 
-  //
+    //
+    // POP 
+    //
 
-    // remove the top node in the PQ (largest if Max PQ, else smallest )
+      // remove the top node in the PQ (largest if Max PQ, else smallest )
     int pop(Node* start = nullptr, Node** startPtr = nullptr) {
 
         //  start: default value for "start==nullptr" supports recursion
@@ -223,7 +263,7 @@ public:
 
         if (space == 0) cout << "\nPrinting Tree (Geeks) ****************" << endl; // print if we are at the first level
 
-          // Increase distance between levels  
+        // Increase distance between levels  
         space += count;
 
         // Process right child first  
