@@ -2,14 +2,12 @@
 #include <string>
 #include <limits>
 #include <cmath>
-#include <iomanip> // for setw() and setFill()
-
+#include <iomanip>
 
 using namespace std;
 
-
 //
-// CLASS:  NODE 
+// CLASS: NODE 
 //
 
 class Node {
@@ -23,13 +21,11 @@ public:
         left = nullptr;           // be sure next Node is null
         right = nullptr;           // be sure next Node is null
     }
-}; // end class definition for Node
-
+};
 
 //
 // CLASS:  MAX PRIORITY QUEUE
 //
-
 
 class MaxPriorityQueueLinkedList {
 private:
@@ -83,7 +79,7 @@ public:
     // BUBBLE DOWN (called by pop)
     //
 
-      // recursively swap the smaller value down, starting with the head
+    // recursively swap the smaller value down, starting with the head
     void bubbleDown(Node* start = nullptr, Node* parent = nullptr) {
 
         if (start == nullptr)
@@ -110,34 +106,15 @@ public:
         bubbleDown(pickChild, start); // consider largest Child
           // note: largestChild could be nullptr if start has no children.
           //       this case is handled by the null check at top
-
-    }  // end: bubbleDown()
-
-    void bubbleUp(Node* start = nullptr, Node* parent = nullptr) {
-
-        // nothing to bubble up
-        if (start == nullptr)
-            return;
-
-        // heap invariant satisfied
-        if (comparePQ(start->value, parent->value) == -1)
-            return;
-        
-        if(parent != nullptr) 
-            swapUp(start, parent);
-
-        // TODO: figure out how to recurse up tree
-        // bubbleUp();
     }
 
     //
     // PUSH - push a new Node instance into the Priority Queue
     //
 
+    //  start: default value for "start==nullptr" supports recursion
+    //  parent:  the pointer to the parent of "start", if any
     void push(int i, Node* start = nullptr, Node* parent = nullptr) {
-
-        //  start: default value for "start==nullptr" supports recursion
-        //  parent:  the pointer to the parent of "start", if any
 
         if (start == nullptr) {
             // start was not specified, so assume the head
@@ -151,16 +128,19 @@ public:
             // insert left if left is null
         } else if (start->left == nullptr) {
             start->left = new Node(i);
+            // swap if heap invariant is not satisfied
+            swapUp(start->left, start);
             // insert right if right is null
         } else if (start->right == nullptr) {
             start->right = new Node(i);
+            // swap if heap invariant is not satisfied
+            swapUp(start->right, start);
             // we need to recurse either left or right to find a place to insert
         } else {
             // randomly choose 0 or 1
             int randNum = rand() % 2;
             if (randNum == 0) {
                 // recurse left, pass the left child
-                // TODO: MAY NEED TO CHANGE START LATER
                 push(i, start->left, start);
             } else {
                 // recurse right, pass the right child
@@ -168,34 +148,71 @@ public:
             }
         }
 
+        // preserve heap invariant
+        if (parent != nullptr) {
+            swapUp(start, parent);
+        }
+
         currentSize++;
-        return;
     }
 
     //
     // POP 
     //
 
-      // remove the top node in the PQ (largest if Max PQ, else smallest )
-    int pop(Node* start = nullptr, Node** startPtr = nullptr) {
+    // remove the top node in the PQ (largest if Max PQ, else smallest )
+    //  start: default value for "start==nullptr" supports recursion
+    //  ptrToStart: the address of the left or right pointer that refers to start
+    int pop(Node* start = nullptr, Node** ptrToStart = nullptr) {
 
-        //  start: default value for "start==nullptr" supports recursion
-        //  startPtr: the address of the left or right pointer that refers to start
-
-
-        if (start == nullptr) { // start was not specified, so assume the head
+        // start was not specified, so assume the head
+        if (start == nullptr) {
             start = head;
-            startPtr = nullptr;     // a precaution - parent must always be null for the head
+            // a precaution - parent must always be null for the head
+            ptrToStart = nullptr;
         }
 
-        // TODO HINT
+        // PQ is empty
+        if (start == nullptr) {
+            return -1;
+        }
 
-        return 1000000; // this should never happen
-    } // end pop()
+        // when start is a leaf node (has no children)
+        if (start->left == nullptr && start->right == nullptr) {
+            // keep hold of node we will delete
+            Node temp = *head;
+            // make initial swap of head with the selected leaf node
+            swapPQ(start->value, head->value);
+            // remove value we are popping from tree
+            delete start;
+            // update pointer that was pointing to start
+            // when tree has more nodes than just a head
+            if (ptrToStart != nullptr) {
+                *ptrToStart = nullptr;
+                bubbleDown(head);
+            } else {
+                // if we popped and deleted the head (last value in tree)
+                head = nullptr;
+            }
 
- //
- // IS EMPTY
- //
+            currentSize--;
+            return temp.value;
+        }
+
+        // maintain a balanced tree by randomly choosing a direction
+        int randNum = rand() % 2;
+        // traverse down left side of tree
+        if (randNum == 0) {
+            // pass new value for start until we find a leaf node and a pointer to it to nullify later
+            return pop(start->left, &start->left);
+        }
+        // traverse down right side of tree
+        return pop(start->right, &start->right);
+    }
+
+    //
+    // IS EMPTY
+    //
 
     bool isEmpty() {
         // Return true if the queue is empty, else false
@@ -225,32 +242,26 @@ public:
             return; // head is null, so nothing to print
         }
 
-
         // current
-
         cout << start->value << ", ";  // print the current node
-      // LEFT
 
+        // LEFT
         if (start->left != nullptr)   // only recurse if we have a left child
             print(start->left);
 
-
-
         // RIGHT
-
         if (start->right != nullptr)   // only recurse if we have a right child
             print(start->right);
-    } // end print()
+    }
 
-  //
-  // PRINT TREE GEEKS
-  //   FROM https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
-  //
+    //
+    // PRINT TREE GEEKS
+    //   FROM https://www.geeksforgeeks.org/print-binary-tree-2-dimensions/
+    //
 
-      // Function to print binary tree in 2D  
-      // It does reverse inorder traversal  
-      // count = allocation of space per node horizontally - spreads out the tree left to right
-
+    // Function to print binary tree in 2D  
+    // It does reverse inorder traversal  
+    // count = allocation of space per node horizontally - spreads out the tree left to right
     void printTreeGeeks(int count = 10, int space = 0, char prefix = '<', Node* start = nullptr) {
 
         if (start == nullptr)
@@ -288,12 +299,11 @@ public:
         // Process left child  
         if (start->left != nullptr)
             printTreeGeeks(count, space, '\\', start->left);
-    } // end printTreeGeeks()
+    }
 
-
-//
-// PRINT STATS
-//
+    //
+    // PRINT STATS
+    //
 
     void printStats() {
 
@@ -312,10 +322,7 @@ public:
 
     }
 
-};  // end definition of MAX PRIORITY QUEUE CLASS
-
-
-
+};
 
 //
 // TEST ME - this routine will test your program and grade your submission
@@ -330,8 +337,6 @@ void testMe() {
     cout << "------------------------------" << endl;
     cout << "        TESTING HW" << endl;
     cout << "------------------------------" << endl;
-
-
 
     bool isEmptyOk = true;     // ismEmpty() working: 5 points
     bool getSizeOk = true;     // getSize() working: 5 points
@@ -385,7 +390,6 @@ void testMe() {
         totalScore += 5;
     }
 
-
     //
     // TEST POP A
     //
@@ -405,8 +409,6 @@ void testMe() {
             totalScore += 10; // push/pop working for simple test
         }
     }
-
-
 
     //
     // TEST POP B
@@ -599,8 +601,7 @@ void testMe() {
 
 
 
-} // end testMe()
-
+}
 
 //
 // Get an integer from input (until success)
@@ -624,12 +625,11 @@ int getIntegerInput() {
     }
     return num; // return the input integer
 
-} // end getIntegerInput()
+}
 
 //
 // MAIN
 //
-
 
 int main() {
     std::cout << "HW BONUS HINT: Max Priority Queue using a Binary Tree\n";
@@ -661,9 +661,8 @@ int main() {
 
         else mpq.push(num); // push num into the max priority queue
 
-        mpq.print(); // print contents of the max priority queue
-        // mpq.printTreeGeeks(); // print as a tree
+        // mpq.print(); // print contents of the max priority queue
+        mpq.printTreeGeeks(); // print as a tree
 
-    } // end while
+    }
 }
-
