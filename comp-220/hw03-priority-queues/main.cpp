@@ -27,7 +27,7 @@ public:
 // CLASS:  MAX PRIORITY QUEUE
 //
 
-class MaxPriorityQueueLinkedList {
+class MaxPriorityQueueBinaryHeap {
 private:
     Node* head = nullptr;
     int currentSize = 0;   // # of items in the stack, also next avaialble stack position
@@ -35,8 +35,8 @@ private:
     int swapCount = 0;    // count of how many swaps during the lifetime of this MPQ
 
 public:
-    MaxPriorityQueueLinkedList() { // constructor
-      //cout << "Created new Max Priority Queue." << endl;
+    MaxPriorityQueueBinaryHeap() {
+        //cout << "Created new Max Priority Queue." << endl;
 
         if (!isEmpty()) { // new queues should be empty
             cout << "WARNING !!!: Is your isEmpty() function working properly?" << endl;
@@ -330,7 +330,7 @@ public:
 
 void testMe() {
 
-    MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+    MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
 
     int totalScore = 0;
 
@@ -397,7 +397,7 @@ void testMe() {
     cout << "testMe() Pop Test A: Testing push(1), pop() with new queue..." << endl;
 
     {
-        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+        MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
         mpq.push(1);
         int num = mpq.pop();
 
@@ -416,7 +416,7 @@ void testMe() {
 
     {
         cout << "testMe() Pop Test B: Testing push(1), push(2),pop() with new queue..." << endl;
-        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+        MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
         mpq.push(1);
         mpq.push(2);
         int num = mpq.pop();
@@ -436,7 +436,7 @@ void testMe() {
 
     {
         cout << "testMe() Pop Test C: Testing pop() on empty queue == -1..." << endl;
-        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+        MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
 
         int num = mpq.pop();
         if (num != -1) {
@@ -456,7 +456,7 @@ void testMe() {
     {
 
         cout << "testMe() Push N/Pop N: Testing N pushes and N pops with new queue..." << endl;
-        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+        MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
         bool finishedOk = true;
         int maxCount = 10;
         for (int i = 0; i < maxCount; i++) mpq.push(i); // load up a bunch of values
@@ -484,7 +484,7 @@ void testMe() {
     {
         int maxCount = 1000;
         cout << "testMe() Stress test: Pushing and Popping randomly " << maxCount << "  times..." << endl;
-        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+        MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
 
       // random push/pop test
         srand(time(NULL));
@@ -518,7 +518,7 @@ void testMe() {
     {
         int maxCount = 1000;
         cout << "testMe() Sort test: Pushing " << maxCount << "  times, then popping " << maxCount << " times.. should produce a descending sorted list... " << endl;
-        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+        MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
 
         bool isDescending = true;
 
@@ -571,7 +571,7 @@ void testMe() {
     {
 
         cout << "testMe() Push 1K(random)/Pop 1K: Testing 1K pushes and 1K pops with new queue..." << endl;
-        MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+        MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
         bool bonusOk = true;
         int maxCount = 10000;
         for (int i = 0; i < maxCount; i++) mpq.push(rand() % maxCount); // load up a bunch of random values
@@ -641,7 +641,7 @@ int main() {
 
     // interactive mode below
 
-    MaxPriorityQueueLinkedList mpq; // create an instance of a Max Priority Queue
+    MaxPriorityQueueBinaryHeap mpq; // create an instance of a Max Priority Queue
 
     // "mpq" is the instance of our Max Priority Queue
     // now we can fill or empty it by pushing and popping
