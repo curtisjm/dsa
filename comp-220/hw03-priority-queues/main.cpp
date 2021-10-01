@@ -122,19 +122,23 @@ public:
             // a precaution - parent must always be null for the head
             parent = nullptr;
         }
+
         // if the start is still null, we insert the new node at the top
         if (start == nullptr) {
             head = new Node(i);
+            currentSize++;
             // insert left if left is null
         } else if (start->left == nullptr) {
             start->left = new Node(i);
             // swap if heap invariant is not satisfied
             swapUp(start->left, start);
+            currentSize++;
             // insert right if right is null
         } else if (start->right == nullptr) {
             start->right = new Node(i);
             // swap if heap invariant is not satisfied
             swapUp(start->right, start);
+            currentSize++;
             // we need to recurse either left or right to find a place to insert
         } else {
             // randomly choose 0 or 1
@@ -153,7 +157,7 @@ public:
             swapUp(start, parent);
         }
 
-        currentSize++;
+        return;
     }
 
     //
@@ -165,16 +169,16 @@ public:
     //  ptrToStart: the address of the left or right pointer that refers to start
     int pop(Node* start = nullptr, Node** ptrToStart = nullptr) {
 
+        // PQ is empty
+        if (head == nullptr) {
+            return -1;
+        }
+
         // start was not specified, so assume the head
         if (start == nullptr) {
             start = head;
             // a precaution - parent must always be null for the head
             ptrToStart = nullptr;
-        }
-
-        // PQ is empty
-        if (start == nullptr) {
-            return -1;
         }
 
         // when start is a leaf node (has no children)
@@ -199,7 +203,7 @@ public:
             return temp.value;
         }
 
-        // maintain a balanced tree by randomly choosing a direction
+        // maintain a balanced tree by randomly choosing a direction to go when searching for a leaf node
         int randNum = rand() % 2;
         // traverse down left side of tree
         if (randNum == 0) {
@@ -637,7 +641,7 @@ int main() {
 
     // test mode below - uncomment when you want to see your grade
 
-       // testMe();
+    testMe();
 
     // interactive mode below
 
