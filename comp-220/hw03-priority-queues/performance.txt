@@ -1,0 +1,12 @@
+--- Push ---
+For pushing a value into our tree, we will have to find an available spot to insert it as a child of a leaf node.
+This will require us to recursively traverse down the tree to find a valid place to insert, which can take up to O(logN) where logN is the height of the tree.
+This will result in logarithmic time complexity.
+Bubbling up that is necessary after insertion is built into the push function with calls to the swapUp function, which having O(1) time complexity does not add onto our total time complexity for pushing.
+
+--- Pop ---
+In order to pop a node off the top of our tree we must first swap it with a leaf node.
+This requires us to find a leaf node by traversing down the tree until we are at the bottom if one is not provided to us.
+That traversal could require us to pass over the whole height tree with a potential time complexity of O(logN).
+We then have to bubble smaller element down the tree from the head which can take up to another O(logN) time.
+These two operations together will be O(logN) + O(logN) = O(2logN), however we can ignore the constant coefficient with Big O Notation and write the time complexity as O(logN).
