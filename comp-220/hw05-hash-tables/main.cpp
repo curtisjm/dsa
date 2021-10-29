@@ -7,7 +7,6 @@ using namespace std;
 
 static int compareCount = 0;
 
-
 //
 // NODE CLASS  
 //
@@ -24,7 +23,6 @@ public:
         value = _val; // initialize the val in the node to our passed in _val argument
     }
 }; // end Node Class
-
 
 //
 // SYMBOL TABLE CLASS
@@ -62,49 +60,74 @@ public:
         delete[] hashTable;   // free the hashTable when we leave
     } // end destructor
 
-
   //
   // HASH FUNCTION
   //
 
     int hashFunction(string s, int m) {  // simple summation of ascii values mod m
-        // TODO: convert s into a number in the range of 0 to m-1 (so we can use that number as a location in an array of size "m" )
-        return -1; // TODO: you'll need to return a value here in the range 0 to m-1
+        // convert s into a number in the range of 0 to m-1 (so we can use that number as a location in an array of size "m" )
+        int sum = 0;
+        for (char c : s) {
+            sum += c;
+        }
+        return sum % m; // return a value here in the range 0 to m-1
     }
 
     //
-    //  FIND NODE
-    //  TODO: search the linked list of nodes started at "temp" for a node that contains the requested key
-    //  TODO: stop searching when temp->next is nullptr
-    //  TODO: return a pointer to node if found, or nullptr if not found
+    // FIND NODE
     //
 
     Node* findNodeInLinkedList(Node* temp, string key) {
-
-        // TODO: Your code goes here
-
-        return nullptr; // TODO: be sure to return a pointer to the node here, or nullptr, as appropriate
+        // search the linked list of nodes started at "temp" for a node that contains the requested key
+        // stop searching when temp->next is nullptr
+        while (temp->next != nullptr) {
+            if (temp->key == key) {
+                // return the desired node if found
+                return temp;
+            }
+            temp = temp->next;
+        }
+        // return nullptr if not found
+        return nullptr;
     }
-
 
     //
     // insertKeyVal - insert the given key, value pair into the ST; return true if a value was inserted
-    // TODO: determine the bucketId using the hashFunction() 
-    // TODO: if the bucket is null, insert a new node with the key and value at the head of that bucket's linked list
-    // TODO: if the bucket is not null, search the linked list at that bucket to determine if the node is in the bucket
-    // TODO: if the node is found in the bucket, overwrite its value and return false indicating that no new key was created
-    // TODO: if the node is not found in the bucket, insert a new node at the head of the bucket's linked list and return true
-    // TODO: be sure to increment the class member variable "bucketsUsed" only when a previously empty bucket is filled
-    // TODO: be sure to increment the class member variable "currentSize" any time a new node is created (but not when an existing node is overwritten with a different value, per above
+    //
 
-
+    // TODO: fix segmentation fault with large values
     bool insertKeyVal(string key, int val) {
+        // determine the bucketId using the hashFunction()
+        int bucketId = hashFunction(key, val);
 
-        // TODO: Your code goes here
+        // if the bucket is null, insert a new node with the key and value at the head of that bucket's linked list
+        if (hashTable[bucketId] == nullptr) {
+            hashTable[bucketId] = new Node(key, val);
+            currentSize++;
+            bucketsUsed++;
+            return true;
+        }
 
-        return false; // TODO: you must return true or false here
+        // search the linked list at that bucket to determine if the node is in the bucket
+        Node* existingNode = findNodeInLinkedList(hashTable[bucketId], key);
+        // if the node is not found in the bucket, insert a new node at the head of the bucket's linked list and return true
+        if (existingNode == nullptr) {
+            // create new node
+            Node* newNode = new Node(key, val);
+            // insert newNode in front of the head
+            newNode->next = hashTable[bucketId];
+            // update backward pointer
+            hashTable[bucketId]->prev = newNode;
+            // update head
+            hashTable[bucketId] = newNode;
+            currentSize++;
+            return true;
+        }
+
+        // if the node is found in the bucket, overwrite its value and return false indicating that no new key was created
+        existingNode->value = val;
+        return false;
     }
-
 
     //
     // deleteKey - delete the requested key if it exists, return true if found & deleted
@@ -113,8 +136,8 @@ public:
     // TODO: if the bucket is empty, return false (nothing deleted)
     // TODO: if the bucket is not empty, search its doubly-linked list using findNodeInLinkedList() to see if the key exists
     // TODO: if the node is not found, return false (nothing deleted)
-    // TODO: if the node is found at the head of the doubly-linked list, delete it and update the head AND new first node's prev pointer apppropriately
-    // TODO: if the node is found at the end of the doubly-linked list, delete it and update the new last node's next pointer apppropriately
+    // TODO: if the node is found at the head of the doubly-linked list, delete it and update the head AND new first node's prev pointer appropriately
+    // TODO: if the node is found at the end of the doubly-linked list, delete it and update the new last node's next pointer appropriately
     // TODO: if the node is found in the middle of the doubly-linked list, remove it, and update BOTH prev AND next pointers appropriately
     // TODO: don't forget to update prev and next pointers in all cases where appropriate - since this is a doubly linked list
     // TODO: be sure to decrement the class member variable "bucketsUsed" only when a previously filled bucket becomes empty as a result of the delete
@@ -168,8 +191,8 @@ public:
   //
 
     bool isEmpty() {
-
-        return false; // TODO: you must return true or false here, depending on whether the symbol table is empty
+        // return true or false depending on whether the symbol table is empty
+        return (currentSize == 0);
     }
 
     //
@@ -177,7 +200,8 @@ public:
     //
 
     int getSize() {
-        return 0; // TODO you must the current size of the symbol table (the current number of nodes, not buckets used.)
+        // return the current size of the symbol table (the current number of nodes, not buckets used.)
+        return currentSize;
     }
 
     //
@@ -202,13 +226,8 @@ public:
     // LOAD FACTOR
     //
     float loadFactor() {
-
-        // TODO: return the floating point load factor for the hash table (ratio of buckets use to total number of buckets)
-
-        float lf = -1.0;  // TODO: you'll need to change this
-
-        //if (debug) cout << " Load factor = " << lf << endl;
-        return(lf);
+        // return the floating point load factor for the hash table (ratio of buckets use to total number of buckets)
+        return currentSize == 0 ? 0.0 : (float)currentSize / (float)maxBuckets;
     }
 
     //
@@ -252,14 +271,11 @@ public:
 
 }; // end SymbolTable Class
 
-
 /*
-
 Call this global function when ready to test your entire assignment.
 */
 
 void testMe() {
-
     int totalPoints = 0;
     bool doubleLinksWork = true; // assume double-linked list is implemented and works until/if we find a failure using testLinks()
 
@@ -354,7 +370,6 @@ void testMe() {
         cout << (pass ? "  passed (+9)" : " failed (+0)") << endl;
         totalPoints += (pass ? 9 : 0);
     }
-
 
     {
         cout << "Test G: getValue()" << endl;
