@@ -93,7 +93,7 @@ public:
     //
 
     bool insertKeyVal(string key, int val) {
-        // determine the bucketId using the hashFunction()
+        // determine the bucketId (array location) using the hashFunction()
         int bucketId = hashFunction(key, maxBuckets);
 
         // if the bucket is null, insert a new node with the key and value at the head of that bucket's linked list
@@ -128,13 +128,9 @@ public:
     //
     // deleteKey - delete the requested key if it exists, return true if found & deleted
     //
-    // TODO: if the node is found in the middle of the doubly-linked list, remove it, and update BOTH prev AND next pointers appropriately
-    // TODO: don't forget to update prev and next pointers in all cases where appropriate - since this is a doubly linked list
-    // TODO: be sure to decrement the class member variable "bucketsUsed" only when a previously filled bucket becomes empty as a result of the delete
-    // TODO: be sure to decrement the class member variable "currentSize" any time node is deleted 
 
     bool deleteKey(string key) {
-        // determine the bucketId using the hashFunction()
+        // determine the bucketId (array location) using the hashFunction()
         int bucketId = hashFunction(key, maxBuckets);
 
         // if the bucket is empty, return false (nothing deleted)
@@ -181,24 +177,29 @@ public:
         delete toDelete;
         currentSize--;
         return true;
-    } // end deleteKey()
+    }
 
-  //
-  // getValue  - return the value associated with a specific string key , 
-  //        return -1 if not found
-  // TODO: determine the bucketId (array location) using the hashFunction() 
-  // TODO: if the bucket is empty, return -1 (nothing found)
-  // TODO: if the bucket is not empty, search its doubly-linked list using findNodeInLinkedList() to see if the key exists
-  // TODO: if the node is found, return its value
-  // TODO: if the node is not found, return -1
-  //
-  //
+    //
+    // getValue  - return the value associated with a specific string key , 
+    //        return -1 if not found
 
     int getValue(string key) {
+        // determine the bucketId (array location) using the hashFunction()
+        int bucketId = hashFunction(key, maxBuckets);
 
-        // TODO: your code goes here
+        // if the bucket is empty, return -1 (nothing found)
+        if (hashTable[bucketId] == nullptr)
+            return -1;
 
-        return 0; // TODO: you must return the value of the node found, or -1 if not found
+        // if the bucket is not empty, search its doubly-linked list using findNodeInLinkedList() to see if the key exists
+        Node* foundNode = findNodeInLinkedList(hashTable[bucketId], key);
+
+        // if the node is not found, return -1
+        if (foundNode == nullptr)
+            return -1;
+
+        // if the node is found, return its value
+        return foundNode->value;
     }
 
     //
