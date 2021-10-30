@@ -624,7 +624,7 @@ void testMe() {
 int main() {
     std::cout << "Symbol Table Homework 5\n";
 
-    //testMe();         // uncomment when you are ready to self-test
+    testMe();         // uncomment when you are ready to self-test
 
     cout << "Instructions:\nTo insert: Enter a key string and then an integer value, separated by a space, then hit return.\nTo Delete: Enter a key and the letter x, separated by a space, then hit return.\nTo Get a value: Enter a key and the letter g, separated by a space, then hit return." << endl;
 
