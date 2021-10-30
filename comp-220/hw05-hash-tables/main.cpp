@@ -128,19 +128,59 @@ public:
     //
     // deleteKey - delete the requested key if it exists, return true if found & deleted
     //
-    // TODO: if the node is found at the head of the doubly-linked list, delete it and update the head AND new first node's prev pointer appropriately
-    // TODO: if the node is found at the end of the doubly-linked list, delete it and update the new last node's next pointer appropriately
     // TODO: if the node is found in the middle of the doubly-linked list, remove it, and update BOTH prev AND next pointers appropriately
     // TODO: don't forget to update prev and next pointers in all cases where appropriate - since this is a doubly linked list
     // TODO: be sure to decrement the class member variable "bucketsUsed" only when a previously filled bucket becomes empty as a result of the delete
     // TODO: be sure to decrement the class member variable "currentSize" any time node is deleted 
 
     bool deleteKey(string key) {
+        // determine the bucketId using the hashFunction()
+        int bucketId = hashFunction(key, maxBuckets);
 
+        // if the bucket is empty, return false (nothing deleted)
+        if (hashTable[bucketId] == nullptr)
+            return false;
 
+        // if the bucket is not empty, search its doubly-linked list using findNodeInLinkedList() to see if the key exists
+        Node* toDelete = findNodeInLinkedList(hashTable[bucketId], key);
 
-        return false; // TODO: you must return true or false here
+        // if the node is not found, return false (nothing deleted)
+        if (toDelete == nullptr)
+            return false;
 
+        // if the node is found at the head of the doubly-linked list, delete it and update the head and new first node's prev pointer
+        if (toDelete == hashTable[bucketId]) {
+            // detach old head
+            hashTable[bucketId] = toDelete->next;
+            // if there is still a node in the bucket
+            if (toDelete->next != nullptr)
+                // nullify previouse pointer for new head
+                toDelete->next->prev = nullptr;
+            else
+                // the bucket is empty
+                bucketsUsed--;
+            delete toDelete;
+            currentSize--;
+            return true;
+        }
+
+        // if the node is found at the end of the doubly-linked list, delete it and update the new last node's next pointer
+        if (toDelete->next == nullptr) {
+            // detach tail node
+            toDelete->prev->next = nullptr;
+            delete toDelete;
+            currentSize--;
+            return true;
+        }
+
+        // if the node is found in the middle of the doubly-linked list, remove it, and update both prev and next pointers
+        // update previous node's next pointer
+        toDelete->prev->next = toDelete->next;
+        // update next node's previous pointer
+        toDelete->next->prev = toDelete->prev;
+        delete toDelete;
+        currentSize--;
+        return true;
     } // end deleteKey()
 
   //
