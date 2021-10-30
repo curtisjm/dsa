@@ -17,15 +17,16 @@ int hashFunction(string s, int m) {  // simple summation of ascii values mod m
 }
 
 int main() {
-    // string str = "hello test";
+    // // string str = "hello test";
 
-    // cout << hashFunction(str, 10);
-    int currentSize = 10;
-    int maxBuckets = 55;
+    // // cout << hashFunction(str, 10);
+    // int currentSize = 10;
+    // int maxBuckets = 55;
 
-    float lf = currentSize == 0 ? 0.0 : (float)currentSize / (float)maxBuckets;
+    // float lf = currentSize == 0 ? 0.0 : (float)currentSize / (float)maxBuckets;
 
-    cout << lf;
+    // cout << lf;
+    cout << hashFunction("asdf", 10);
 
 
     return 0;

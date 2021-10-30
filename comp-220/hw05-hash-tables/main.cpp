@@ -67,9 +67,9 @@ public:
     int hashFunction(string s, int m) {  // simple summation of ascii values mod m
         // convert s into a number in the range of 0 to m-1 (so we can use that number as a location in an array of size "m" )
         int sum = 0;
-        for (char c : s) {
+        for (char c : s)
             sum += c;
-        }
+
         return sum % m; // return a value here in the range 0 to m-1
     }
 
@@ -78,27 +78,23 @@ public:
     //
 
     Node* findNodeInLinkedList(Node* temp, string key) {
+        Node* n = temp;
         // search the linked list of nodes started at "temp" for a node that contains the requested key
-        // stop searching when temp->next is nullptr
-        while (temp->next != nullptr) {
-            if (temp->key == key) {
-                // return the desired node if found
-                return temp;
-            }
-            temp = temp->next;
-        }
-        // return nullptr if not found
-        return nullptr;
+        // stop searching when temp->next is nullptr or when key is found
+        while (n->key != key && n->next != nullptr)
+            n = n->next;
+
+        // return the desired node if found, if not found return null
+        return n->key == key ? n : nullptr;
     }
 
     //
     // insertKeyVal - insert the given key, value pair into the ST; return true if a value was inserted
     //
 
-    // TODO: fix segmentation fault with large values
     bool insertKeyVal(string key, int val) {
         // determine the bucketId using the hashFunction()
-        int bucketId = hashFunction(key, val);
+        int bucketId = hashFunction(key, maxBuckets);
 
         // if the bucket is null, insert a new node with the key and value at the head of that bucket's linked list
         if (hashTable[bucketId] == nullptr) {
@@ -132,10 +128,6 @@ public:
     //
     // deleteKey - delete the requested key if it exists, return true if found & deleted
     //
-    // TODO: determine the bucketId (array location)  using the hashFunction() based on the key of the node we want to delete
-    // TODO: if the bucket is empty, return false (nothing deleted)
-    // TODO: if the bucket is not empty, search its doubly-linked list using findNodeInLinkedList() to see if the key exists
-    // TODO: if the node is not found, return false (nothing deleted)
     // TODO: if the node is found at the head of the doubly-linked list, delete it and update the head AND new first node's prev pointer appropriately
     // TODO: if the node is found at the end of the doubly-linked list, delete it and update the new last node's next pointer appropriately
     // TODO: if the node is found in the middle of the doubly-linked list, remove it, and update BOTH prev AND next pointers appropriately
@@ -145,7 +137,7 @@ public:
 
     bool deleteKey(string key) {
 
-        // TODO: Your code goes here
+
 
         return false; // TODO: you must return true or false here
 
