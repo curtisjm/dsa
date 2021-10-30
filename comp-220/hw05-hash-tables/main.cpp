@@ -60,9 +60,9 @@ public:
         delete[] hashTable;   // free the hashTable when we leave
     } // end destructor
 
-  //
-  // HASH FUNCTION
-  //
+    //
+    // HASH FUNCTION
+    //
 
     int hashFunction(string s, int m) {  // simple summation of ascii values mod m
         // convert s into a number in the range of 0 to m-1 (so we can use that number as a location in an array of size "m" )
@@ -180,8 +180,8 @@ public:
     }
 
     //
-    // getValue  - return the value associated with a specific string key , 
-    //        return -1 if not found
+    // getValue  - return the value associated with a specific string key , return -1 if not found
+    //        
 
     int getValue(string key) {
         // determine the bucketId (array location) using the hashFunction()
@@ -204,20 +204,26 @@ public:
 
     //
     // containsKey - Return True if the ST contains the requested key
-    // TODO: determine the bucketId using the hashFunction() 
-    // TODO: if the bucket is empty, return false (nothing found)
-    // TODO: if the bucket is not empty, search its linked list using findNodeInLinkedList() to see if the key exists
-    // TODO: if the node is found, return true
-    // TODO: if the node is not found, return false
     //
 
     bool containsKey(string key) {
+        // determine the bucketId (array location) using the hashFunction()
+        int bucketId = hashFunction(key, maxBuckets);
+        
+        // if the bucket is empty, return false (nothing found)
+        if (hashTable[bucketId] == nullptr)
+            return false;
 
-        // your code goes here
+        // if the bucket is not empty, search its linked list using findNodeInLinkedList() to see if the key exists
+        Node* foundNode = findNodeInLinkedList(hashTable[bucketId], key);
 
-        return false; // TODO: you must return true or false here, depending on whether or not the key was found
+        // if the node is not found, return false
+        if (foundNode == nullptr)
+            return false;
 
-    } // end constainsKey()
+        // if the node is found, return true
+        return true;
+    } 
 
   //
   // isEmpty() return true if the symbol table is isEmpty
