@@ -209,7 +209,7 @@ public:
     bool containsKey(string key) {
         // determine the bucketId (array location) using the hashFunction()
         int bucketId = hashFunction(key, maxBuckets);
-        
+
         // if the bucket is empty, return false (nothing found)
         if (hashTable[bucketId] == nullptr)
             return false;
@@ -223,11 +223,11 @@ public:
 
         // if the node is found, return true
         return true;
-    } 
+    }
 
-  //
-  // isEmpty() return true if the symbol table is isEmpty
-  //
+    //
+    // isEmpty() return true if the symbol table is isEmpty
+    //
 
     bool isEmpty() {
         // return true or false depending on whether the symbol table is empty
@@ -264,6 +264,7 @@ public:
     //
     // LOAD FACTOR
     //
+
     float loadFactor() {
         // return the floating point load factor for the hash table (ratio of buckets use to total number of buckets)
         return currentSize == 0 ? 0.0 : (float)currentSize / (float)maxBuckets;
@@ -615,11 +616,9 @@ void testMe() {
     cin >> i;
 } // end testMe
 
-
 //
 // MAIN
 //
-
 
 int main() {
     std::cout << "Symbol Table Homework 5\n";
