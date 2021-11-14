@@ -125,7 +125,7 @@ public:
             tv = tv->next;
         }
         if (debug) cout << endl;
-        return adj[vid]; // return the adjacency list
+        return adj[vid]; // return the adjancency list
 
     } // end getAdjVertices()
 
@@ -242,7 +242,15 @@ public:
             cout << "dfsCC(): vertex " << vid << " is out of bounds 0, " << N - 1 << ". Abort." << endl;
         }
 
-        // TODO: your code goes here
+
+        wasVisited[vid] = true; // mark this vertex as visited
+        compId[vid] = componentCount; // assign the component id to this vertex
+
+        for (Node* n = g->getAdjVertices(vid); n != nullptr; n = n->next) { // for each neighbor of vid
+            if (!wasVisited[n->id]) { // if we have not visited this neighbor yet
+                dfsCC(g, n->id); // do a dfs for this neighbor
+            }
+        }
     }
 
 
@@ -258,8 +266,7 @@ public:
             return false;
         }
 
-        // TODO: your implementation goes here
-
+        return (getComponentId(va) == getComponentId(vb));
     }
 
     //
@@ -271,7 +278,8 @@ public:
             cout << "getComponentId(): vertex " << vid << " is out of bounds 0, " << N - 1 << ". Abort." << endl;
             return -1;
         }
-        // TODO: your implementation goes here
+
+        return compId[vid];
     }
 
     void printComponents() {
@@ -286,6 +294,7 @@ public:
 private:
 
 }; // end ConnectedComponent class
+
 
 //
 // Get an integer from input (until success)
@@ -363,7 +372,7 @@ int main() {
                 cout << "Yes, " << x << " and " << y << " are in the same component " << endl;
             else
                 cout << "No, " << x << " and " << y << " are NOT the same component " << endl;
-        }     else
+        } else
             cout << "Sorry - one of those ids is out of range.  Please enter a value between 0 and " << (N - 1) << endl;
         //g.printAdj();         // print out adjacencies
     } // end while()
