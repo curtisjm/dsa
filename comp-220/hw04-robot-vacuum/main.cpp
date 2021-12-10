@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
+#include <ctime>
 
 using namespace std;
 
@@ -212,6 +213,7 @@ bool isValid(int row, int col) {
     return (row >= 0) && (row < numrows) && (col >= 0) && (col < numcols) && (grid[row][col] != '*');
 }
 
+// if the distance to the nearest garbage is greater than 1, find a series of single moves to get there
 vector<Point> BFS(Point start, Point end) {
     // movement "matrix"
     int rowNum[] = { -1, 0, 0, 1, -1, 1, -1, 1 };
@@ -250,8 +252,8 @@ vector<Point> BFS(Point start, Point end) {
 
         // enqueue adjacent nodes
         for (int i = 0; i < 8; i++) {
-            int row = pt.x + rowNum[i];
-            int col = pt.y + colNum[i];
+            int row = pt.y + rowNum[i];
+            int col = pt.x + colNum[i];
 
             // if adjacent cell is valid, has path and
             // not visited yet, enqueue it.
@@ -272,7 +274,7 @@ vector<Point> BFS(Point start, Point end) {
 // SWEEP GRID TODO - you need to write this function so that it cleans grid[][] without sweeping up obstacles
 //
 
-void sweepGrid() {
+void sweepGrid2() {
     int totalMoves = 0;
     bool continueCleaning = containsGarbage(); // check if there is any garbage left
 
@@ -304,8 +306,43 @@ void sweepGrid() {
     }
 }
 
+void sweepGrid() {
+    int totalMoves = 0;
+
+    // movement "matrix"
+    int rowNum[] = { -1, 0, 0, 1, -1, 1, -1, 1 };
+    int colNum[] = { 0, -1, 1, 0, 1, 1, -1, -1 };
+
+    bool continueCleaning = containsGarbage(); // check if there is any garbage left
+
+    int myRow = getRow(); // get current row location of the robot
+    int myCol = getCol(); // get current row location of the robot
+
+    while (continueCleaning) {
+        bool didMove = false;
+        myRow = getRow();
+        myCol = getCol();
+
+        while (!didMove) {
+            // select a random direction to move in
+            int randDir = rand() % 8;
+            int row = myRow + rowNum[randDir];
+            int col = myCol + colNum[randDir];
+            if (isValid(row, col)) {
+                if (moveTo(row, col)) {
+                    totalMoves++;
+                    didMove = true;
+                    cout << "Moved to " << row << " " << col << endl;
+                }
+            }
+        }
+        continueCleaning = containsGarbage();
+    }
+}
+
 
 int main() {
+    srand(time(NULL));
     std::cout << "HW5 ALT - Robot Vacuum (starter) \n";
 
     initGrid();   // init the grid with garbage and obstacles
