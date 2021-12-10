@@ -1,4 +1,7 @@
 #include <iostream>
+#include <algorithm>
+#include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -32,7 +35,6 @@ void initGrid() {
 //
 
 void printGrid() {
-
     cout << "-";
     for (int c = 0; c < numcols; c++) // print top border
         cout << "---";
@@ -93,10 +95,6 @@ bool moveTo(int r, int c) { // move the robot to this location and sweep up what
     return true;
 }
 
-
-
-
-
 //
 // PRINT SCORE
 //
@@ -106,7 +104,6 @@ void printScore() { // written for you: (please do not change this function)
     int obstaclesTotal = 0;
     int garbageTotal = 0;
     int garbageMissed = 0;
-
 
     for (int r = 0; r < numrows; r++) {
         for (int c = 0; c < numcols; c++) {
@@ -142,6 +139,134 @@ void printScore() { // written for you: (please do not change this function)
     else  cout << "Hmmm - might want to call in some iRobot back-up for help.  Let me know if you have questions!" << endl;
 }
 
+struct Point {
+    // x is column, y is row
+    int x;
+    int y;
+};
+
+struct Node {
+    Point pt;
+    double distance;
+};
+
+// a heuristic function that is normally used to controll A*'s behavior
+// in this case, I will be using it to find the nearest garbage by finding the distance to all garbage nodes first
+// reference: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
+double heuristic(int fromX, int fromY, int toX, int toY) {
+    // D is the minimum cost for moving from one space to an adjacent space
+    double D = 1;
+    // D2 is the cost of moving diagonally
+    double D2 = 1;
+    // when D, D2 = 1, this is the Chebyshev distance: 
+    // https://en.wikipedia.org/wiki/Chebyshev_distance
+
+    double dx = abs(fromX - toX);
+    double dy = abs(fromY - toY);
+
+    return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy);
+}
+
+// find all garbage nodes
+vector<Node> getAllDistances(int x, int y) {
+    vector<Node> distances;
+
+    // iterate over all rows and columns
+    for (int i = 0; i < numrows; i++) {
+        for (int j = 0; j < numcols; j++) {
+            // don't include current node in distances list
+            // bool sameNode = (i == y && j == x);
+            if (grid[i][j] == '.') {
+                // add data about each node to the distance object
+                Point p;
+                p.x = j;
+                p.y = i;
+                Node n;
+                n.distance = heuristic(x, y, j, i);
+                // append to the list of distances
+                distances.push_back(n);
+            }
+        }
+    }
+
+    // sort the distances vector by distance
+    sort(distances.begin(), distances.end(), [](Node a, Node b) {
+        return a.distance < b.distance;
+        });
+
+    return distances;
+}
+
+// check if there is any remaining garbage
+bool containsGarbage() {
+    for (int i = 0; i < numrows; i++) {
+        for (int j = 0; j < numcols; j++) {
+            if (grid[i][j] == '.') return true;
+        }
+    }
+    return false;
+}
+
+// check if a move is valid
+bool isValid(int row, int col) {
+    return (row >= 0) && (row < numrows) && (col >= 0) && (col < numcols) && (grid[row][col] != '*');
+}
+
+vector<Point> BFS(Point start, Point end) {
+    // movement "matrix"
+    int rowNum[] = { -1, 0, 0, 1, -1, 1, -1, 1 };
+    int colNum[] = { 0, -1, 1, 0, 1, 1, -1, -1 };
+
+    bool visited[numrows][numcols];
+    // memset(visited, false, sizeof visited);
+
+    // mark start as visited
+    visited[start.y][start.x] = true;
+
+    queue<Node> q;
+
+    // distance to start is 0
+    Node n = { start, 0 };
+    q.push(n);
+
+    while (!q.empty()) {
+        Node curr = q.front();
+        Point pt = curr.pt;
+
+        // found the end
+        if (pt.x == end.x && pt.y == end.y) {
+            vector<Point> path;
+            path.push_back(curr.pt);
+            while (curr.pt.x != start.x || curr.pt.y != start.y) {
+                curr = q.front();
+                q.pop();
+                path.push_back(curr.pt);
+            }
+            return path;
+        }
+
+        // dequeue front
+        q.pop();
+
+        // enqueue adjacent nodes
+        for (int i = 0; i < 8; i++) {
+            int row = pt.x + rowNum[i];
+            int col = pt.y + colNum[i];
+
+            // if adjacent cell is valid, has path and
+            // not visited yet, enqueue it.
+            if (isValid(row, col) && grid[row][col] && !visited[row][col]) {
+                // mark cell as visited and enqueue it
+                visited[row][col] = true;
+                Node adjNode = { {row, col}, curr.distance + 1 };
+                q.push(adjNode);
+            }
+        }
+    }
+
+    // if we get here, we have not found a path
+    return vector<Point>();
+}
 
 //
 // SWEEP GRID TODO - you need to write this function so that it cleans grid[][] without sweeping up obstacles
@@ -149,28 +274,34 @@ void printScore() { // written for you: (please do not change this function)
 
 void sweepGrid() {
     int totalMoves = 0;
+    bool continueCleaning = containsGarbage(); // check if there is any garbage left
 
-    //  NOTE - you must use getRow() and getCol() to find the current location of the robot
-    int myRow = getRow(); // get current row location of the robot
-    int myCol = getCol(); // get current row location of the robot
+    // TODO: make sure we can go backwards to get out of a corner
 
-   // NOTE: you must use "moveTo()" below to move your robot - don't sweep up obstacles though!
-   // NOTE: obstacles WILL be swept up (bad) so you want to avoid them at all costs (or lose points)
-    bool didMove = moveTo(myRow + 1, myCol + 1);    // attempt to move to this location and sweep up whatever is there
+    while (continueCleaning) {
+        // NOTE - you must use getRow() and getCol() to find the current location of the robot
+        int myRow = getRow(); // get current row location of the robot
+        int myCol = getCol(); // get current row location of the robot
 
-    // NOTE: you can test whether a requested move worked or not
-    if (!didMove) cout << "oops, that move did not work - maybe I hit the walls of the room???" << endl;
+        vector<Node> distances = getAllDistances(myCol, myRow); // vector of distances to all garbage nodes
 
+        // find the closest garbage node
+        Node closest = distances[0];
 
-    // NOTE - you can use the current status of the grid[][] or the original original[][] in any way you like to aid your algorithm
+        // move to the closest garbage node if it is is not an obstacle
+        if (moveTo(closest.pt.x, closest.pt.y)) {
+            totalMoves++;
+        } else {
+            vector<Point> path = BFS({ myCol, myRow }, closest.pt);
+            for (Point p : path) {
+                if (moveTo(p.x, p.y)) {
+                    totalMoves++;
+                }
+            }
+        }
 
-    // THESE ARE JUST EXAMPLES
-    if (original[myRow][myCol] == '*') cout << "oops I just swept up an obstacle!" << endl;
-
-    // NOTE: when you check a location in the grid, be sure you do not go out of bounds!
-    if ((myRow + 1 < numrows) && grid[myRow + 1][myCol] == '*') cout << "there is an obstacle in the row below me" << endl;
-
-    // done sweeping
+        continueCleaning = containsGarbage(); // check if there is any garbage left
+    }
 }
 
 
@@ -187,5 +318,4 @@ int main() {
     printGrid();
 
     printScore(); // your score
-
 }
