@@ -278,8 +278,6 @@ void sweepGrid2() {
     int totalMoves = 0;
     bool continueCleaning = containsGarbage(); // check if there is any garbage left
 
-    // TODO: make sure we can go backwards to get out of a corner
-
     while (continueCleaning) {
         // NOTE - you must use getRow() and getCol() to find the current location of the robot
         int myRow = getRow(); // get current row location of the robot
@@ -332,14 +330,13 @@ void sweepGrid() {
                 if (moveTo(row, col)) {
                     totalMoves++;
                     didMove = true;
-                    cout << "Moved to " << row << " " << col << endl;
+                    // cout << "Moved to " << row << " " << col << endl;
                 }
             }
         }
         continueCleaning = containsGarbage();
     }
 }
-
 
 int main() {
     srand(time(NULL));
@@ -349,7 +346,7 @@ int main() {
     cout << "Dirty Room before sweeping: " << endl;
     printGrid();
 
-    sweepGrid();  // TODO Your routine!
+    sweepGrid();
 
     cout << "Clean Room after sweeping: " << endl;
     printGrid();
